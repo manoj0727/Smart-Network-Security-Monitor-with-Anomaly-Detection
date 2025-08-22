@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  network-monitor:
+    build: .
+    container_name: smart-network-monitor
+    privileged: true
+    network_mode: host
+    volumes:
+      - ./logs:/app/logs
+      - ./captures:/app/captures
+      - ./models:/app/models
+      - ./reports:/app/reports
+      - ./config:/app/config
+    environment:
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - LOG_LEVEL=INFO
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    
+  redis:
+    image: redis:7-alpine
+    container_name: monitor-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    
+  influxdb:
+    image: influxdb:2.7
+    container_name: monitor-influxdb
+    ports:
+      - "8086:8086"
+    volumes:
+      - influxdb-data:/var/lib/influxdb2
+      - influxdb-config:/etc/influxdb2
+    environment:
+      - DOCKER_INFLUXDB_INIT_MODE=setup
+      - DOCKER_INFLUXDB_INIT_USERNAME=admin
+      - DOCKER_INFLUXDB_INIT_PASSWORD=SecurePassword123!
+      - DOCKER_INFLUXDB_INIT_ORG=network-monitor
+      - DOCKER_INFLUXDB_INIT_BUCKET=metrics
+      - DOCKER_INFLUXDB_INIT_ADMIN_TOKEN=mytoken
+    restart: unless-stopped
+    
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: monitor-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+    restart: unless-stopped
+    
+  grafana:
+    image: grafana/grafana:latest
+    container_name: monitor-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./config/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./config/grafana/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=redis-datasource
+    depends_on:
+      - prometheus
+      - influxdb
+      - redis
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+  influxdb-data:
+  influxdb-config:
+  prometheus-data:
+  grafana-data:
