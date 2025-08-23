@@ -1,0 +1,8 @@
+{
+  "dns": ["8.8.8.8", "8.8.4.4"],
+  "dns-opts": ["ndots:0"],
+  "dns-search": ["."],
+  "max-concurrent-downloads": 3,
+  "max-concurrent-uploads": 3,
+  "registry-mirrors": []
+}
