@@ -2,26 +2,28 @@
 
 A Matrix-themed network security monitoring system with real-time threat detection and hacker-style dashboard.
 
-## 🚀 Quick Start
+## 🚀 Quick Start - ONE COMMAND!
 
-### 1. Install Dependencies
+### Option 1: Shell Script (Recommended)
 ```bash
-pip install -r requirements.txt
+./start.sh
 ```
 
-### 2. Run the API Server
+### Option 2: Python Script
 ```bash
+python3 start.py
+```
+
+### Option 3: Manual Start (if scripts don't work)
+```bash
+# Terminal 1 - API Server
 python3 src/main.py --api-only --port 8001
+
+# Terminal 2 - Dashboard
+cd frontend && python3 -m http.server 8082
 ```
 
-### 3. Open Dashboard
-```bash
-cd frontend
-python3 -m http.server 8082
-```
-
-### 4. Access Dashboard
-Open browser: **http://localhost:8082**
+**That's it!** The dashboard will open automatically at **http://localhost:8082**
 
 ## ✨ Features
 
