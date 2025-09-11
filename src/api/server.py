@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from datetime import datetime
 import structlog
 
 logger = structlog.get_logger()
@@ -54,5 +55,3 @@ def create_app():
         }
     
     return app
-
-from datetime import datetime
