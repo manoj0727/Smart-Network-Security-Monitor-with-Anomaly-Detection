@@ -5,45 +5,113 @@ let isAutoRefreshing = false;
 let activityData = [];
 let chartContext = null;
 
+// Matrix Rain Effect
+function initMatrixRain() {
+    const canvas = document.getElementById('matrix-rain');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}10101010";
+    const matrixArray = matrix.split("");
+    
+    const fontSize = 10;
+    const columns = canvas.width / fontSize;
+    
+    const drops = [];
+    for(let x = 0; x < columns; x++) {
+        drops[x] = Math.random() * -100;
+    }
+    
+    function drawMatrix() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = '#0f0';
+        ctx.font = fontSize + 'px monospace';
+        
+        for(let i = 0; i < drops.length; i++) {
+            const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+            
+            if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        }
+    }
+    
+    setInterval(drawMatrix, 35);
+}
+
+// Binary Background Generator
+function generateBinaryBackground() {
+    const container = document.getElementById('binaryBg');
+    let binaryString = '';
+    for(let i = 0; i < 10000; i++) {
+        binaryString += Math.random() > 0.5 ? '1' : '0';
+        if(i % 100 === 0) binaryString += '\n';
+    }
+    container.textContent = binaryString;
+}
+
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Dashboard initialized');
+    console.log('🚀 CYBERDEFENSE SYSTEM ACTIVATED');
+    initMatrixRain();
+    generateBinaryBackground();
     initializeChart();
     checkConnection();
     refreshData();
+    startGlitchEffects();
+    
+    // Add typing effect to log entries
+    addLogEntry('SYSTEM BOOT SEQUENCE COMPLETE', 'info');
+    addLogEntry('NEURAL NETWORK INITIALIZED', 'info');
+    addLogEntry('THREAT DETECTION ALGORITHMS LOADED', 'info');
 });
+
+// Glitch Effects
+function startGlitchEffects() {
+    setInterval(() => {
+        const elements = document.querySelectorAll('.glow-green');
+        elements.forEach(el => {
+            if(Math.random() > 0.95) {
+                el.style.textShadow = '-2px 0 #f00, 2px 0 #0ff, 0 0 20px #0f0';
+                setTimeout(() => {
+                    el.style.textShadow = '0 0 10px #0f0, 0 0 20px #0f0, 0 0 30px #0f0';
+                }, 100);
+            }
+        });
+    }, 2000);
+}
 
 // Check API connection
 async function checkConnection() {
-    const statusBadge = document.getElementById('connectionStatus');
-    const spinner = document.getElementById('loadingSpinner');
+    const statusElement = document.getElementById('connectionStatus');
     
     try {
-        spinner.style.display = 'inline-block';
         const response = await fetch(`${API_BASE_URL}/health`);
         
         if (response.ok) {
-            statusBadge.textContent = 'Online';
-            statusBadge.className = 'status-badge status-online';
-            showAlert('Connected to API successfully!', 'success');
+            statusElement.textContent = '[ONLINE]';
+            statusElement.style.color = '#0f0';
+            addLogEntry('CONNECTION ESTABLISHED - SECURE CHANNEL ACTIVE', 'info');
         } else {
-            throw new Error('API not responding');
+            throw new Error('API BREACH');
         }
     } catch (error) {
-        statusBadge.textContent = 'Offline';
-        statusBadge.className = 'status-badge status-offline';
-        showAlert('Cannot connect to API. Make sure the server is running on port 8001.', 'danger');
-        console.error('Connection error:', error);
-    } finally {
-        spinner.style.display = 'none';
+        statusElement.textContent = '[OFFLINE]';
+        statusElement.style.color = '#f00';
+        addLogEntry('WARNING: CONNECTION LOST - ATTEMPTING RECONNECT...', 'threat');
+        console.error('SYSTEM ERROR:', error);
     }
 }
 
 // Refresh all data
 async function refreshData() {
-    console.log('🔄 Refreshing data...');
-    const spinner = document.getElementById('loadingSpinner');
-    spinner.style.display = 'inline-block';
+    console.log('⟳ SCANNING NETWORK...');
     
     try {
         // Fetch health status
@@ -60,30 +128,33 @@ async function refreshData() {
             updateDashboard(statusData);
         }
         
-        // Add log entry
-        addLogEntry('Data refreshed successfully', 'info');
+        // Add scan complete entry
+        addLogEntry('NETWORK SCAN COMPLETE - DATA SYNCHRONIZED', 'info');
         
     } catch (error) {
-        console.error('Error refreshing data:', error);
-        addLogEntry('Failed to refresh data: ' + error.message, 'error');
-    } finally {
-        spinner.style.display = 'none';
+        console.error('CRITICAL ERROR:', error);
+        addLogEntry('ERROR: DATA SYNCHRONIZATION FAILED - ' + error.message, 'threat');
     }
 }
 
 // Update dashboard with new data
 function updateDashboard(data) {
-    // Update status cards
-    document.getElementById('systemStatus').textContent = 
-        data.capture_status.charAt(0).toUpperCase() + data.capture_status.slice(1);
+    // Update status
+    const statusEl = document.getElementById('systemStatus');
+    statusEl.textContent = data.capture_status === 'active' ? 'ACTIVE' : 'STANDBY';
+    statusEl.className = data.capture_status === 'active' ? 'stat-value glow-green' : 'stat-value';
     
-    // Update packet count with animation
+    // Update counters with cyber effects
     animateNumber('packetsAnalyzed', data.packets_analyzed);
     
-    // Update threats with alert if increased
+    // Check for threats
     const currentThreats = parseInt(document.getElementById('threatsDetected').textContent);
     if (data.threats_detected > currentThreats && currentThreats > 0) {
         showThreatAlert(data.threats_detected);
+        document.body.style.animation = 'threat-flash 0.5s';
+        setTimeout(() => {
+            document.body.style.animation = '';
+        }, 500);
     }
     animateNumber('threatsDetected', data.threats_detected);
     
@@ -92,28 +163,27 @@ function updateDashboard(data) {
     
     // Update chart
     updateChart(data);
-    
-    // Update log count
-    const logEntries = document.querySelectorAll('.log-entry').length;
-    document.getElementById('logCount').textContent = `${logEntries} entries`;
 }
 
 // Update health status
 function updateHealthStatus(data) {
-    document.getElementById('healthStatus').textContent = 
-        data.status.charAt(0).toUpperCase() + data.status.slice(1);
+    const healthEl = document.getElementById('healthStatus');
+    healthEl.textContent = data.status.toUpperCase();
     
     const timestamp = new Date(data.timestamp);
     document.getElementById('lastUpdate').textContent = 
-        `Last update: ${timestamp.toLocaleTimeString()}`;
+        `LAST SYNC: ${timestamp.toLocaleTimeString()}`;
 }
 
-// Animate number changes
+// Animate number with cyber effect
 function animateNumber(elementId, newValue) {
     const element = document.getElementById(elementId);
     const currentValue = parseInt(element.textContent) || 0;
     
     if (currentValue === newValue) return;
+    
+    // Add glitch effect during animation
+    element.style.animation = 'glitch 0.3s';
     
     const increment = (newValue - currentValue) / 20;
     let current = currentValue;
@@ -124,15 +194,16 @@ function animateNumber(elementId, newValue) {
         steps++;
         
         if (steps >= 20) {
-            element.textContent = newValue;
+            element.textContent = newValue.toLocaleString();
             clearInterval(animation);
+            element.style.animation = '';
         } else {
-            element.textContent = Math.round(current);
+            element.textContent = Math.round(current).toLocaleString();
         }
     }, 30);
 }
 
-// Add log entry
+// Add log entry with typing effect
 function addLogEntry(message, type = 'info') {
     const logEntries = document.getElementById('logEntries');
     const entry = document.createElement('div');
@@ -141,30 +212,27 @@ function addLogEntry(message, type = 'info') {
     if (type === 'threat') entry.className += ' threat';
     if (type === 'anomaly') entry.className += ' anomaly';
     
-    const time = new Date().toLocaleTimeString();
-    entry.innerHTML = `
-        <div class="log-time">${time}</div>
-        <div class="log-message">${message}</div>
-    `;
+    const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+    entry.innerHTML = `<span class="log-time">[${time}]</span> ${message}`;
     
-    // Add to beginning of log
+    // Add to beginning
     logEntries.insertBefore(entry, logEntries.firstChild);
     
-    // Keep only last 50 entries
-    while (logEntries.children.length > 50) {
+    // Keep only last 100 entries
+    while (logEntries.children.length > 100) {
         logEntries.removeChild(logEntries.lastChild);
     }
     
     // Update count
     document.getElementById('logCount').textContent = 
-        `${logEntries.children.length} entries`;
+        `${logEntries.children.length} ENTRIES`;
 }
 
 // Clear logs
 function clearLogs() {
     const logEntries = document.getElementById('logEntries');
     logEntries.innerHTML = '';
-    addLogEntry('Logs cleared', 'info');
+    addLogEntry('LOGS PURGED - MEMORY CLEARED', 'info');
 }
 
 // Toggle auto-refresh
@@ -172,63 +240,96 @@ function toggleAutoRefresh() {
     const btn = document.getElementById('autoRefreshBtn');
     
     if (isAutoRefreshing) {
-        // Stop auto-refresh
         clearInterval(autoRefreshInterval);
         autoRefreshInterval = null;
         isAutoRefreshing = false;
-        btn.textContent = '▶️ Start Auto-Refresh';
-        addLogEntry('Auto-refresh stopped', 'info');
+        btn.textContent = '▶ AUTO-SCAN';
+        addLogEntry('AUTO-SCAN DEACTIVATED', 'info');
     } else {
-        // Start auto-refresh (every 5 seconds)
         autoRefreshInterval = setInterval(refreshData, 5000);
         isAutoRefreshing = true;
-        btn.textContent = '⏸️ Stop Auto-Refresh';
-        addLogEntry('Auto-refresh started (5s interval)', 'info');
+        btn.textContent = '⏸ STOP SCAN';
+        addLogEntry('AUTO-SCAN ACTIVATED - 5 SECOND INTERVALS', 'info');
     }
 }
 
-// Simulate threat (for testing)
-function simulateThreat() {
-    const threats = parseInt(document.getElementById('threatsDetected').textContent) || 0;
-    const packets = parseInt(document.getElementById('packetsAnalyzed').textContent) || 0;
-    
-    // Update values
-    animateNumber('threatsDetected', threats + 1);
-    animateNumber('packetsAnalyzed', packets + 100);
-    
-    // Show threat alert
-    showThreatAlert(threats + 1);
-    
-    // Add log entries
-    addLogEntry('⚠️ THREAT DETECTED: Port scan attempt from 192.168.1.100', 'threat');
-    addLogEntry('Automatic response: IP blocked in firewall', 'info');
-    
-    // Update chart
-    updateChart({
-        threats_detected: threats + 1,
-        packets_analyzed: packets + 100,
-        anomalies_detected: parseInt(document.getElementById('anomaliesDetected').textContent) || 0
-    });
+// Simulate threat
+async function simulateThreat() {
+    try {
+        const response = await fetch(`${API_BASE_URL}/api/simulate/start`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            await refreshData();
+            
+            if (data.status === 'threat_detected') {
+                addLogEntry(`☠ THREAT DETECTED: ${data.threat}`, 'threat');
+                addLogEntry(`SOURCE: ${data.source_ip} | SEVERITY: ${data.severity.toUpperCase()}`, 'threat');
+                addLogEntry('COUNTERMEASURES DEPLOYED - THREAT NEUTRALIZED', 'info');
+                showThreatAlert(data.threats_total);
+            } else if (data.status === 'anomaly_detected') {
+                addLogEntry(`⚠ ANOMALY: ${data.anomaly}`, 'anomaly');
+                addLogEntry('NEURAL NETWORK ANALYZING PATTERN...', 'anomaly');
+            } else {
+                addLogEntry('SCAN COMPLETE - NO THREATS DETECTED', 'info');
+            }
+        }
+    } catch (error) {
+        console.error('SIMULATION ERROR:', error);
+        addLogEntry('SIMULATION MODULE ERROR', 'threat');
+    }
 }
 
-// Show threat alert modal
+// Continuous simulation
+let simulationInterval = null;
+let isSimulating = false;
+
+function toggleContinuousSimulation() {
+    const btn = document.getElementById('continuousSimBtn');
+    
+    if (isSimulating) {
+        clearInterval(simulationInterval);
+        simulationInterval = null;
+        isSimulating = false;
+        btn.textContent = '◉ LIVE ATTACK';
+        addLogEntry('ATTACK SIMULATION TERMINATED', 'info');
+        fetch(`${API_BASE_URL}/api/simulate/stop`, { method: 'POST' });
+    } else {
+        isSimulating = true;
+        btn.textContent = '■ CEASE FIRE';
+        addLogEntry('INITIATING LIVE ATTACK SIMULATION...', 'threat');
+        addLogEntry('WARNING: GENERATING HOSTILE TRAFFIC PATTERNS', 'threat');
+        
+        simulationInterval = setInterval(async () => {
+            await simulateThreat();
+        }, 2000);
+    }
+}
+
+// Show threat alert
 function showThreatAlert(threatCount) {
     const modal = document.getElementById('threatModal');
     const details = document.getElementById('threatDetails');
     
     details.innerHTML = `
-        <p><strong>Alert Level:</strong> High</p>
-        <p><strong>Total Threats:</strong> ${threatCount}</p>
-        <p><strong>Action Taken:</strong> Automatic blocking enabled</p>
-        <p><strong>Recommendation:</strong> Review security logs for details</p>
+        <p style="color: #f00;">⚠ SECURITY BREACH DETECTED ⚠</p>
+        <p>THREAT LEVEL: <span style="color: #ff0;">CRITICAL</span></p>
+        <p>TOTAL THREATS: <span style="color: #f00;">${threatCount}</span></p>
+        <p>STATUS: <span style="color: #0f0;">NEUTRALIZED</span></p>
+        <p style="margin-top: 10px;">FIREWALL UPDATED | IDS ACTIVE</p>
     `;
     
     modal.style.display = 'flex';
     
-    // Auto-close after 5 seconds
+    // Auto-close after 3 seconds
     setTimeout(() => {
         closeThreatModal();
-    }, 5000);
+    }, 3000);
 }
 
 // Close threat modal
@@ -236,26 +337,16 @@ function closeThreatModal() {
     document.getElementById('threatModal').style.display = 'none';
 }
 
-// Show alert message
-function showAlert(message, type = 'info') {
-    const alertBox = document.getElementById('alertBox');
-    alertBox.className = `alert alert-${type}`;
-    alertBox.textContent = message;
-    alertBox.style.display = 'block';
-    
-    // Hide after 3 seconds
-    setTimeout(() => {
-        alertBox.style.display = 'none';
-    }, 3000);
-}
-
-// Initialize chart
+// Initialize chart with cyber theme
 function initializeChart() {
     const canvas = document.getElementById('chartCanvas');
     if (canvas && canvas.getContext) {
         chartContext = canvas.getContext('2d');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = 200;
+        
         // Initialize with empty data
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < 20; i++) {
             activityData.push({
                 packets: 0,
                 threats: 0,
@@ -263,13 +354,12 @@ function initializeChart() {
                 time: new Date()
             });
         }
-        drawChart();
+        drawCyberChart();
     }
 }
 
-// Update chart with new data
+// Update chart data
 function updateChart(data) {
-    // Add new data point
     activityData.push({
         packets: data.packets_analyzed,
         threats: data.threats_detected,
@@ -277,119 +367,99 @@ function updateChart(data) {
         time: new Date()
     });
     
-    // Keep only last 10 points
-    if (activityData.length > 10) {
+    if (activityData.length > 20) {
         activityData.shift();
     }
     
-    drawChart();
+    drawCyberChart();
 }
 
-// Draw chart
-function drawChart() {
+// Draw cyber-themed chart
+function drawCyberChart() {
     if (!chartContext) return;
     
     const canvas = chartContext.canvas;
     const width = canvas.width;
     const height = canvas.height;
     
-    // Clear canvas
-    chartContext.clearRect(0, 0, width, height);
+    // Clear with fade effect
+    chartContext.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    chartContext.fillRect(0, 0, width, height);
     
-    // Find max value for scaling
-    let maxValue = 1;
-    activityData.forEach(point => {
-        maxValue = Math.max(maxValue, point.packets, point.threats * 100, point.anomalies * 50);
-    });
-    
-    // Draw grid lines
-    chartContext.strokeStyle = '#e5e7eb';
+    // Draw grid
+    chartContext.strokeStyle = 'rgba(0, 255, 0, 0.1)';
     chartContext.lineWidth = 1;
-    for (let i = 0; i <= 4; i++) {
-        const y = (height / 4) * i;
+    for (let i = 0; i <= 5; i++) {
+        const y = (height / 5) * i;
         chartContext.beginPath();
         chartContext.moveTo(0, y);
         chartContext.lineTo(width, y);
         chartContext.stroke();
     }
     
-    // Draw data lines
-    const barWidth = width / activityData.length;
+    // Find max value
+    let maxValue = 100;
+    activityData.forEach(point => {
+        maxValue = Math.max(maxValue, point.packets);
+    });
+    
+    // Draw packet line
+    chartContext.strokeStyle = '#0ff';
+    chartContext.lineWidth = 2;
+    chartContext.shadowColor = '#0ff';
+    chartContext.shadowBlur = 10;
+    chartContext.beginPath();
     
     activityData.forEach((point, index) => {
-        const x = index * barWidth;
+        const x = (width / activityData.length) * index;
+        const y = height - (point.packets / maxValue) * height * 0.8;
         
-        // Draw packets bar (blue)
-        const packetsHeight = (point.packets / maxValue) * height * 0.8;
-        chartContext.fillStyle = 'rgba(59, 130, 246, 0.6)';
-        chartContext.fillRect(x + 5, height - packetsHeight, barWidth - 10, packetsHeight);
-        
-        // Draw threats indicator (red)
-        if (point.threats > 0) {
-            const threatsHeight = (point.threats * 100 / maxValue) * height * 0.8;
-            chartContext.fillStyle = 'rgba(239, 68, 68, 0.8)';
-            chartContext.fillRect(x + barWidth/3, height - threatsHeight, barWidth/3, threatsHeight);
+        if (index === 0) {
+            chartContext.moveTo(x, y);
+        } else {
+            chartContext.lineTo(x, y);
         }
-        
-        // Draw anomalies indicator (yellow)
-        if (point.anomalies > 0) {
-            const anomaliesHeight = (point.anomalies * 50 / maxValue) * height * 0.8;
-            chartContext.fillStyle = 'rgba(245, 158, 11, 0.8)';
-            chartContext.fillRect(x + barWidth/2, height - anomaliesHeight, barWidth/3, anomaliesHeight);
+    });
+    chartContext.stroke();
+    
+    // Draw threat markers
+    chartContext.fillStyle = '#f00';
+    chartContext.shadowColor = '#f00';
+    activityData.forEach((point, index) => {
+        if (point.threats > 0) {
+            const x = (width / activityData.length) * index;
+            const y = height - (point.packets / maxValue) * height * 0.8;
+            
+            chartContext.beginPath();
+            chartContext.arc(x, y, 5, 0, Math.PI * 2);
+            chartContext.fill();
         }
     });
     
-    // Draw labels
-    chartContext.fillStyle = '#6b7280';
-    chartContext.font = '12px sans-serif';
-    chartContext.fillText('Packets', 10, 20);
-    chartContext.fillStyle = 'rgba(239, 68, 68, 0.8)';
-    chartContext.fillText('Threats', 70, 20);
-    chartContext.fillStyle = 'rgba(245, 158, 11, 0.8)';
-    chartContext.fillText('Anomalies', 130, 20);
+    // Draw anomaly markers
+    chartContext.fillStyle = '#ff0';
+    chartContext.shadowColor = '#ff0';
+    activityData.forEach((point, index) => {
+        if (point.anomalies > 0) {
+            const x = (width / activityData.length) * index;
+            const y = height - (point.packets / maxValue) * height * 0.8;
+            
+            chartContext.beginPath();
+            chartContext.moveTo(x, y - 8);
+            chartContext.lineTo(x - 5, y + 5);
+            chartContext.lineTo(x + 5, y + 5);
+            chartContext.closePath();
+            chartContext.fill();
+        }
+    });
+    
+    // Reset shadow
+    chartContext.shadowBlur = 0;
 }
 
-// WebSocket connection for real-time updates (optional)
-function connectWebSocket() {
-    try {
-        const ws = new WebSocket('ws://localhost:8001/ws');
-        
-        ws.onopen = () => {
-            console.log('WebSocket connected');
-            addLogEntry('Real-time connection established', 'info');
-        };
-        
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            console.log('WebSocket message:', data);
-            
-            // Update dashboard with real-time data
-            if (data.type === 'threat') {
-                addLogEntry(`🚨 Real-time threat: ${data.message}`, 'threat');
-            } else if (data.type === 'anomaly') {
-                addLogEntry(`⚡ Real-time anomaly: ${data.message}`, 'anomaly');
-            }
-            
-            // Refresh dashboard
-            refreshData();
-        };
-        
-        ws.onerror = (error) => {
-            console.error('WebSocket error:', error);
-        };
-        
-        ws.onclose = () => {
-            console.log('WebSocket disconnected');
-            addLogEntry('Real-time connection lost', 'error');
-            
-            // Try to reconnect after 5 seconds
-            setTimeout(connectWebSocket, 5000);
-        };
-        
-    } catch (error) {
-        console.error('WebSocket connection failed:', error);
-    }
-}
-
-// Try to establish WebSocket connection
-// connectWebSocket(); // Uncomment when WebSocket endpoint is available
+// Window resize handler
+window.addEventListener('resize', () => {
+    const canvas = document.getElementById('matrix-rain');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});

@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Security Monitor Dashboard</title>
+    <title>CYBERNET SECURITY MATRIX</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+        
         * {
             margin: 0;
             padding: 0;
@@ -12,436 +14,634 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: #ffffffd2;
+            font-family: 'Orbitron', monospace;
+            background: #000;
+            color: #0f0;
             min-height: 100vh;
-            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        .container {
-            max-width: 1400px;
+        /* Matrix Rain Background */
+        #matrix-rain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0.1;
+        }
+
+        .matrix-column {
+            position: absolute;
+            top: -100vh;
+            font-size: 12px;
+            line-height: 12px;
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0;
+            animation: matrix-fall linear infinite;
+        }
+
+        @keyframes matrix-fall {
+            to {
+                transform: translateY(200vh);
+            }
+        }
+
+        /* Main Container */
+        .cyber-container {
+            position: relative;
+            z-index: 2;
+            padding: 20px;
+            max-width: 1600px;
             margin: 0 auto;
         }
 
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 25px;
+        /* Header */
+        .cyber-header {
+            background: linear-gradient(135deg, rgba(0,255,0,0.1) 0%, rgba(0,255,0,0.05) 100%);
+            border: 2px solid #0f0;
+            border-radius: 0;
+            padding: 30px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0,255,0,0.5), inset 0 0 30px rgba(0,255,0,0.1);
+            animation: pulse-border 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 30px rgba(0,255,0,0.5), inset 0 0 30px rgba(0,255,0,0.1); }
+            50% { box-shadow: 0 0 50px rgba(0,255,0,0.8), inset 0 0 50px rgba(0,255,0,0.2); }
+        }
+
+        .cyber-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,255,0,0.2), transparent);
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            to { left: 100%; }
         }
 
         h1 {
-            color: #333;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px #0f0, 0 0 40px #0f0;
+            animation: glitch 2s infinite;
             display: flex;
             align-items: center;
+            gap: 20px;
+        }
+
+        @keyframes glitch {
+            0%, 100% { text-shadow: 0 0 20px #0f0, 0 0 40px #0f0; }
+            25% { text-shadow: -2px 0 #f00, 2px 0 #0ff, 0 0 20px #0f0; }
+            50% { text-shadow: 2px 0 #f0f, -2px 0 #ff0, 0 0 40px #0f0; }
+            75% { text-shadow: 0 0 20px #0f0, 0 0 40px #0f0; }
+        }
+
+        .status-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #0f0;
+            box-shadow: 0 0 20px #0f0;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .binary-text {
+            font-size: 10px;
+            color: rgba(0,255,0,0.3);
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            animation: binary-scroll 10s linear infinite;
+        }
+
+        @keyframes binary-scroll {
+            to { transform: translateX(-100%); }
+        }
+
+        /* Control Panel */
+        .control-panel {
+            display: flex;
             gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
 
-        .status-badge {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 14px;
-            font-weight: 500;
+        .cyber-btn {
+            background: rgba(0,255,0,0.1);
+            border: 1px solid #0f0;
+            color: #0f0;
+            padding: 12px 25px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+            letter-spacing: 2px;
         }
 
-        .status-online {
-            background: #10b981;
-            color: white;
+        .cyber-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(0,255,0,0.3);
+            transform: translate(-50%, -50%);
+            transition: all 0.5s;
         }
 
-        .status-offline {
-            background: #ef4444;
-            color: white;
+        .cyber-btn:hover {
+            box-shadow: 0 0 20px #0f0, inset 0 0 20px rgba(0,255,0,0.2);
+            transform: translateY(-2px);
         }
 
-        .dashboard {
+        .cyber-btn:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .cyber-btn.danger {
+            border-color: #f00;
+            color: #f00;
+            animation: danger-pulse 1s infinite;
+        }
+
+        @keyframes danger-pulse {
+            0%, 100% { box-shadow: 0 0 5px #f00; }
+            50% { box-shadow: 0 0 20px #f00, 0 0 30px #f00; }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        .card {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
+        .stat-card {
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #0f0;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0f0, transparent);
+            animation: scan-line 2s linear infinite;
         }
 
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        @keyframes scan-line {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
 
-        .card-title {
-            font-size: 18px;
-            color: #555;
+        .stat-card:hover {
+            box-shadow: 0 0 30px rgba(0,255,0,0.5);
+            transform: scale(1.02);
+        }
+
+        .stat-header {
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 15px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.8;
         }
 
-        .card-value {
+        .stat-icon {
+            font-size: 24px;
+            animation: rotate 4s linear infinite;
+        }
+
+        @keyframes rotate {
+            to { transform: rotate(360deg); }
+        }
+
+        .stat-value {
             font-size: 36px;
-            font-weight: bold;
-            color: #333;
+            font-weight: 900;
+            text-shadow: 0 0 10px currentColor;
+            margin: 10px 0;
         }
 
-        .card-subtitle {
-            color: #999;
-            font-size: 14px;
-            margin-top: 5px;
+        .stat-label {
+            font-size: 10px;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
+        .threat-card .stat-value {
+            color: #f00;
+            animation: threat-flash 1s infinite;
         }
 
-        .icon-blue { background: #e0f2fe; color: #0284c7; }
-        .icon-green { background: #dcfce7; color: #16a34a; }
-        .icon-red { background: #fee2e2; color: #dc2626; }
-        .icon-purple { background: #f3e8ff; color: #9333ea; }
-        .icon-yellow { background: #fef3c7; color: #d97706; }
-
-        .activity-log {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        @keyframes threat-flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        .log-header {
+        .anomaly-card .stat-value {
+            color: #ff0;
+        }
+
+        .packets-card .stat-value {
+            color: #0ff;
+        }
+
+        /* Activity Monitor */
+        .activity-monitor {
+            background: rgba(0,0,0,0.9);
+            border: 1px solid #0f0;
+            padding: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            min-height: 300px;
+        }
+
+        .monitor-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0,255,0,0.3);
         }
 
-        .log-entries {
-            max-height: 400px;
+        .monitor-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .terminal-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background: #0f0;
+            animation: cursor-blink 1s infinite;
+            margin-left: 5px;
+        }
+
+        @keyframes cursor-blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .log-container {
+            height: 400px;
             overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            padding: 10px;
+            background: rgba(0,0,0,0.5);
         }
 
         .log-entry {
-            padding: 12px;
-            border-left: 3px solid #e5e7eb;
-            margin-bottom: 10px;
-            background: #f9fafb;
-            border-radius: 5px;
-            transition: all 0.3s ease;
+            margin-bottom: 8px;
+            padding: 8px;
+            border-left: 2px solid #0f0;
+            background: rgba(0,255,0,0.05);
+            animation: slide-in 0.3s ease-out;
+            position: relative;
+            overflow: hidden;
         }
 
-        .log-entry:hover {
-            background: #f3f4f6;
-            border-left-color: #667eea;
+        @keyframes slide-in {
+            from {
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .log-entry::before {
+            content: '>';
+            margin-right: 10px;
+            color: #0f0;
+            font-weight: bold;
         }
 
         .log-entry.threat {
-            border-left-color: #ef4444;
-            background: #fef2f2;
+            border-left-color: #f00;
+            background: rgba(255,0,0,0.1);
+            color: #f00;
+            animation: threat-alert 0.5s ease-out;
+        }
+
+        @keyframes threat-alert {
+            0% { background: rgba(255,0,0,0.5); }
+            100% { background: rgba(255,0,0,0.1); }
         }
 
         .log-entry.anomaly {
-            border-left-color: #f59e0b;
-            background: #fffbeb;
+            border-left-color: #ff0;
+            background: rgba(255,255,0,0.1);
+            color: #ff0;
         }
 
         .log-time {
-            color: #6b7280;
-            font-size: 12px;
-            margin-bottom: 5px;
+            font-size: 10px;
+            opacity: 0.6;
+            margin-right: 10px;
         }
 
-        .log-message {
-            color: #374151;
-            font-size: 14px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 10px;
+        /* Cyber Chart */
+        .cyber-chart {
+            background: rgba(0,0,0,0.9);
+            border: 1px solid #0f0;
+            padding: 20px;
             margin-bottom: 30px;
-        }
-
-        button {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: #667eea;
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #5a67d8;
-        }
-
-        .btn-secondary {
-            background: #e5e7eb;
-            color: #374151;
-        }
-
-        .btn-secondary:hover {
-            background: #d1d5db;
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .chart-container {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .chart {
-            height: 200px;
             position: relative;
-            margin-top: 20px;
+            height: 250px;
         }
 
-        .chart-bar {
-            position: absolute;
-            bottom: 0;
-            width: 30px;
-            background: linear-gradient(to top, #667eea, #764ba2);
-            border-radius: 5px 5px 0 0;
-            transition: height 0.5s ease;
+        .chart-canvas {
+            width: 100%;
+            height: 100%;
+            position: relative;
         }
 
-        .pulse {
-            animation: pulse 2s infinite;
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        ::-webkit-scrollbar-track {
+            background: rgba(0,255,0,0.1);
         }
 
-        .spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-left: 10px;
+        ::-webkit-scrollbar-thumb {
+            background: #0f0;
+            box-shadow: 0 0 10px #0f0;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .alert-danger {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
-        }
-
-        .alert-success {
-            background: #dcfce7;
-            color: #166534;
-            border: 1px solid #bbf7d0;
-        }
-
-        .modal {
+        /* Alert Modal */
+        .cyber-modal {
             display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
         }
 
         .modal-content {
-            background: white;
+            background: #000;
+            border: 2px solid #f00;
             padding: 30px;
-            border-radius: 15px;
             max-width: 500px;
-            width: 90%;
+            animation: modal-appear 0.3s ease-out;
+            box-shadow: 0 0 50px #f00;
+        }
+
+        @keyframes modal-appear {
+            from {
+                transform: scale(0);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
         }
 
         .modal-header {
+            font-size: 24px;
+            color: #f00;
             margin-bottom: 20px;
+            text-transform: uppercase;
+            animation: danger-pulse 0.5s infinite;
         }
 
-        .modal-body {
-            margin-bottom: 20px;
+        /* Loading Animation */
+        .loading-bar {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0f0, transparent);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            animation: loading 2s linear infinite;
         }
 
-        .modal-footer {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Glowing Effects */
+        .glow-green {
+            text-shadow: 0 0 10px #0f0, 0 0 20px #0f0, 0 0 30px #0f0;
+        }
+
+        .glow-red {
+            text-shadow: 0 0 10px #f00, 0 0 20px #f00, 0 0 30px #f00;
+        }
+
+        .glow-yellow {
+            text-shadow: 0 0 10px #ff0, 0 0 20px #ff0, 0 0 30px #ff0;
+        }
+
+        /* Binary Background Pattern */
+        .binary-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0.02;
+            font-size: 10px;
+            line-height: 10px;
+            color: #0f0;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>
-                🛡️ Network Security Monitor
-                <span id="connectionStatus" class="status-badge status-offline">Offline</span>
-                <div id="loadingSpinner" class="spinner" style="display: none;"></div>
+    <div class="loading-bar"></div>
+    
+    <!-- Matrix Rain Effect -->
+    <canvas id="matrix-rain"></canvas>
+    
+    <!-- Binary Background -->
+    <div class="binary-bg" id="binaryBg"></div>
+    
+    <div class="cyber-container">
+        <!-- Header -->
+        <div class="cyber-header">
+            <div class="binary-text">01001000 01000001 01000011 01001011 01000101 01010010</div>
+            <h1 class="glow-green">
+                <span class="status-indicator"></span>
+                CYBERNET SECURITY MATRIX
+                <span id="connectionStatus" style="font-size: 14px; color: #0f0;">[ONLINE]</span>
             </h1>
-            <p style="color: #666; margin-top: 10px;">Real-time network threat detection and monitoring dashboard</p>
-        </header>
+            <p style="color: #0f0; opacity: 0.7; margin-top: 10px; letter-spacing: 3px;">
+                THREAT DETECTION SYSTEM v2.0 | NEURAL NETWORK ACTIVE
+            </p>
+        </div>
 
-        <div class="controls">
-            <button class="btn-primary" onclick="refreshData()">🔄 Refresh</button>
-            <button class="btn-secondary" onclick="toggleAutoRefresh()">
-                <span id="autoRefreshBtn">▶️ Start Auto-Refresh</span>
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <button class="cyber-btn" onclick="refreshData()">
+                <span>⟳ REFRESH</span>
             </button>
-            <button class="btn-secondary" onclick="clearLogs()">🗑️ Clear Logs</button>
-            <button class="btn-danger" onclick="simulateThreat()">⚠️ Simulate Threat</button>
+            <button class="cyber-btn" onclick="toggleAutoRefresh()">
+                <span id="autoRefreshBtn">▶ AUTO-SCAN</span>
+            </button>
+            <button class="cyber-btn" onclick="clearLogs()">
+                <span>⌫ PURGE LOGS</span>
+            </button>
+            <button class="cyber-btn danger" onclick="simulateThreat()">
+                <span>⚠ SIMULATE</span>
+            </button>
+            <button class="cyber-btn danger" onclick="toggleContinuousSimulation()">
+                <span id="continuousSimBtn">◉ LIVE ATTACK</span>
+            </button>
         </div>
 
-        <div id="alertBox" class="alert"></div>
-
-        <div class="dashboard">
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <div class="icon icon-blue">📊</div>
-                        System Status
-                    </div>
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">⚡</span>
+                    <span>SYSTEM STATUS</span>
                 </div>
-                <div class="card-value" id="systemStatus">Ready</div>
-                <div class="card-subtitle">Monitoring Status</div>
+                <div class="stat-value glow-green" id="systemStatus">READY</div>
+                <div class="stat-label">MONITORING ENGINE</div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <div class="icon icon-green">📦</div>
-                        Packets Analyzed
-                    </div>
+            <div class="stat-card packets-card">
+                <div class="stat-header">
+                    <span class="stat-icon">📡</span>
+                    <span>PACKETS INTERCEPTED</span>
                 </div>
-                <div class="card-value" id="packetsAnalyzed">0</div>
-                <div class="card-subtitle">Total packets processed</div>
+                <div class="stat-value" id="packetsAnalyzed">0</div>
+                <div class="stat-label">TOTAL DATA ANALYZED</div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <div class="icon icon-red">🚨</div>
-                        Threats Detected
-                    </div>
+            <div class="stat-card threat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">☠</span>
+                    <span>THREATS NEUTRALIZED</span>
                 </div>
-                <div class="card-value" id="threatsDetected">0</div>
-                <div class="card-subtitle">Security threats found</div>
+                <div class="stat-value" id="threatsDetected">0</div>
+                <div class="stat-label">SECURITY BREACHES BLOCKED</div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <div class="icon icon-yellow">⚡</div>
-                        Anomalies
-                    </div>
+            <div class="stat-card anomaly-card">
+                <div class="stat-header">
+                    <span class="stat-icon">⚠</span>
+                    <span>ANOMALIES DETECTED</span>
                 </div>
-                <div class="card-value" id="anomaliesDetected">0</div>
-                <div class="card-subtitle">Unusual patterns detected</div>
+                <div class="stat-value" id="anomaliesDetected">0</div>
+                <div class="stat-label">UNUSUAL PATTERNS</div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <div class="icon icon-purple">💚</div>
-                        Health Status
-                    </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">💚</span>
+                    <span>SYSTEM HEALTH</span>
                 </div>
-                <div class="card-value" id="healthStatus">-</div>
-                <div class="card-subtitle" id="lastUpdate">Never updated</div>
+                <div class="stat-value glow-green" id="healthStatus">-</div>
+                <div class="stat-label" id="lastUpdate">INITIALIZING...</div>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <div class="icon icon-blue">📡</div>
-                        API Endpoint
-                    </div>
+            <div class="stat-card">
+                <div class="stat-header">
+                    <span class="stat-icon">🌐</span>
+                    <span>NETWORK NODE</span>
                 </div>
-                <div class="card-value" style="font-size: 16px;" id="apiEndpoint">localhost:8001</div>
-                <div class="card-subtitle">Connected endpoint</div>
+                <div class="stat-value" style="font-size: 16px;" id="apiEndpoint">localhost:8001</div>
+                <div class="stat-label">API GATEWAY</div>
             </div>
         </div>
 
-        <div class="chart-container">
-            <h3>📈 Activity Timeline</h3>
-            <div class="chart" id="activityChart">
-                <canvas id="chartCanvas" width="800" height="200"></canvas>
+        <!-- Cyber Chart -->
+        <div class="cyber-chart">
+            <div class="monitor-header">
+                <div class="monitor-title glow-green">THREAT ACTIVITY TIMELINE</div>
+                <span style="color: #0f0; font-size: 10px;">REAL-TIME ANALYSIS</span>
             </div>
+            <canvas id="chartCanvas" class="chart-canvas"></canvas>
         </div>
 
-        <div class="activity-log">
-            <div class="log-header">
-                <h3>📋 Activity Log</h3>
-                <span id="logCount" style="color: #666;">0 entries</span>
+        <!-- Activity Monitor -->
+        <div class="activity-monitor">
+            <div class="monitor-header">
+                <div class="monitor-title glow-green">
+                    SECURITY LOG TERMINAL
+                    <span class="terminal-cursor"></span>
+                </div>
+                <span id="logCount" style="color: #0f0; font-size: 10px;">0 ENTRIES</span>
             </div>
-            <div class="log-entries" id="logEntries">
+            <div class="log-container" id="logEntries">
                 <div class="log-entry">
-                    <div class="log-time">System started</div>
-                    <div class="log-message">Waiting for connection to API...</div>
+                    <span class="log-time">[SYSTEM]</span>
+                    INITIALIZING CYBERDEFENSE MATRIX...
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Threat Modal -->
-    <div id="threatModal" class="modal">
+    <!-- Threat Alert Modal -->
+    <div id="threatModal" class="cyber-modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2>🚨 Threat Detected!</h2>
+            <div class="modal-header glow-red">
+                ⚠ CRITICAL THREAT ALERT ⚠
             </div>
-            <div class="modal-body" id="threatDetails">
-                <p>A potential security threat has been detected on your network.</p>
+            <div id="threatDetails" style="color: #f00;">
+                <p>SECURITY BREACH DETECTED</p>
+                <p>INITIATING COUNTERMEASURES...</p>
             </div>
-            <div class="modal-footer">
-                <button class="btn-primary" onclick="closeThreatModal()">Acknowledge</button>
-            </div>
+            <button class="cyber-btn" onclick="closeThreatModal()" style="margin-top: 20px;">
+                ACKNOWLEDGE
+            </button>
         </div>
     </div>
 
