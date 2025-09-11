@@ -1,6 +1,6 @@
 # 🛡️ CYBERNET SECURITY MATRIX
 
-A Matrix-themed network security monitoring system with real-time threat detection and hacker-style dashboard.
+A Matrix-themed network security monitoring system with real-time threat detection.
 
 ## 🚀 Quick Start - ONE COMMAND!
 
